@@ -3,8 +3,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
-
+import openpyxl as opx
 # create a new Chrome browser instance
+
 browser = webdriver.Chrome()
 
 # navigate to the bank's website
@@ -48,6 +49,7 @@ print(UrlName)
 
 
 for index in UrlName.index:
+    print("hello",index)
     # print(UrlName['Names'][index])
 
     browser = webdriver.Chrome()
@@ -168,7 +170,12 @@ for index in UrlName.index:
     "Zero Liability Protection":[zero_liability_protection],"Spend based waiver":[spend_baised_waiver],"Reward redemption fee":[reward_redemption_fee],"Foreign currency markup":[foreign_currency_markup],"Interest Rates":[interest_rates],"Fuel Surcharge":[fuel_surcharge],
     "Cash advance charge":[cash_adv_charge],"Add on card fee":[add_on_card_fee],
     })
-    df.to_excel(f"{UrlName['Names'][index]}.xlsx", index=False)
+
+
+    with pd.ExcelWriter("newhdfcDetails.xlsx") as writer:
+        df.to_excel(writer, sheet_name= ccls[0], index=False)
+
+    # df.to_excel(, sheet_name = f"{UrlName['Names'][index]}.xlsx", index= False)
 
     # close the browser
     browser.quit()
