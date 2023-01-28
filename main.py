@@ -172,8 +172,8 @@ for index in UrlName.index:
     })
 
 
-    with pd.ExcelWriter("newhdfcDetails.xlsx") as writer:
-        df.to_excel(writer, sheet_name= ccls[0], index=False)
+    with pd.ExcelWriter("newhdfcDetails.xlsx", mode= 'a', engine= "openpyxl") as writer:
+        df.to_excel(writer, sheet_name= ccls[index], index=False)
 
     # df.to_excel(, sheet_name = f"{UrlName['Names'][index]}.xlsx", index= False)
 
