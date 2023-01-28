@@ -30,7 +30,11 @@ print(ccls)
 
 # df = pd.DataFrame({"Names": name_list, "Features":feature_list})
 df = pd.DataFrame({"Names": ccls})
-df.to_excel("hdfcCCNames.xlsx", index=False)
+
+with pd.ExcelWriter("newhdfc.xlsx", mode= 'a', engine= "openpyxl", if_sheet_exists='overlay') as writer1:
+    df.to_excel(writer1, sheet_name='Sheet1', index=False)
+    df.to_excel(writer1, sheet_name='Sheet2', index=False)
+    df.to_excel(writer1, sheet_name='Sheet3', index=False)
 
 # close the browser
 browser.quit()
@@ -38,18 +42,20 @@ browser.quit()
 
 
 
-UrlName = pd.read_excel('hdfcCCNames.xlsx')
+UrlName = pd.read_excel('newhdfc.xlsx', sheet_name="Sheet1")
 
 # print(UrlName)
 UrlName['Names'] = UrlName['Names'].str.split('Credit Card').str[0] + "Credit Card"
 UrlName['Names'] = UrlName['Names'].str.lower()
+UrlName['Names'] = UrlName['Names'].str.replace(" ",'-')
+print(" and -\n" ,UrlName)
+UrlName['Names'] = UrlName['Names'].str.replace("-–-",'-') #weird-ass case
 
-UrlName['Names'] = UrlName['Names'].str.replace(' ','-')
-print(UrlName)
+print("--\n" ,UrlName)
 
 
 for index in UrlName.index:
-    print("hello",index)
+    # print("hello",index)
     # print(UrlName['Names'][index])
 
     browser = webdriver.Chrome()
@@ -171,9 +177,28 @@ for index in UrlName.index:
     "Cash advance charge":[cash_adv_charge],"Add on card fee":[add_on_card_fee],
     })
 
+    # def get_maximum_rows(*, sheet_object):
+    #     rows = 0
+    #     for max_row, row in enumerate(sheet_object, 1):
+    #         if not all(col.value is None for col in row):
+    #             rows += 1
+    #     return rows
 
-    with pd.ExcelWriter("newhdfcDetails.xlsx", mode= 'a', engine= "openpyxl") as writer:
-        df.to_excel(writer, sheet_name= ccls[index], index=False)
+    # workbook = opx.load_workbook('hdfcCCName.xlsx')
+    # sheet_object = workbook.active
+    # max_rows = get_maximum_rows(sheet_object=sheet_object)
+
+    # print(max_rows)
+
+    print(df)
+
+
+    with pd.ExcelWriter("newhdfc.xlsx", mode= 'a', engine= "openpyxl", if_sheet_exists='overlay') as writer:
+        df.to_excel(writer, sheet_name= "Sheet2", startrow= index+1)
+        df.to_excel(writer, sheet_name= "Sheet3", startrow= index+1, index= False)
+        df.to_excel(writer, sheet_name= "Sheet4", startrow= index+1, index= False, header= False)
+
+
 
     # df.to_excel(, sheet_name = f"{UrlName['Names'][index]}.xlsx", index= False)
 
