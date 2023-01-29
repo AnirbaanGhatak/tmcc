@@ -33,8 +33,6 @@ df = pd.DataFrame({"Names": ccls})
 
 with pd.ExcelWriter("newhdfc.xlsx", mode= 'a', engine= "openpyxl", if_sheet_exists='overlay') as writer1:
     df.to_excel(writer1, sheet_name='Sheet1', index=False)
-    df.to_excel(writer1, sheet_name='Sheet2', index=False)
-    df.to_excel(writer1, sheet_name='Sheet3', index=False)
 
 # close the browser
 browser.quit()
@@ -171,36 +169,24 @@ for index in UrlName.index:
         print(p.text)
 
 
-    df = pd.DataFrame({"Name": [credit_card_name], "Category":[category],"Joining Fee":[join_fee],"Renewal Fee":[renewal_fee],"Welcome Bonus":[welcome_bonus],"Reward Rates":[rew_rates],
+    df = pd.DataFrame({"Name": [credit_card_name], "Best For":[category],"Joining Fee":[join_fee],"Renewal Fee":[renewal_fee],"Welcome Bonus":[welcome_bonus],"Reward Rates":[rew_rates],
     "travel":[travel],"Domestic Lounge Access":[domestic_lounge_access],"Insurance Benefits":[insurance_benefits],"Movie & Dining":[movie_and_dining],"Reward redemption":[reward_redemption],"Golf":[golf],"International lounge access":[international_lounge_access],
     "Zero Liability Protection":[zero_liability_protection],"Spend based waiver":[spend_baised_waiver],"Reward redemption fee":[reward_redemption_fee],"Foreign currency markup":[foreign_currency_markup],"Interest Rates":[interest_rates],"Fuel Surcharge":[fuel_surcharge],
     "Cash advance charge":[cash_adv_charge],"Add on card fee":[add_on_card_fee],
     })
-
-    # def get_maximum_rows(*, sheet_object):
-    #     rows = 0
-    #     for max_row, row in enumerate(sheet_object, 1):
-    #         if not all(col.value is None for col in row):
-    #             rows += 1
-    #     return rows
-
-    # workbook = opx.load_workbook('hdfcCCName.xlsx')
-    # sheet_object = workbook.active
-    # max_rows = get_maximum_rows(sheet_object=sheet_object)
-
-    # print(max_rows)
-
-    print(df)
+    
 
 
     with pd.ExcelWriter("newhdfc.xlsx", mode= 'a', engine= "openpyxl", if_sheet_exists='overlay') as writer:
-        df.to_excel(writer, sheet_name= "Sheet2", startrow= index+1)
-        df.to_excel(writer, sheet_name= "Sheet3", startrow= index+1, index= False)
-        df.to_excel(writer, sheet_name= "Sheet4", startrow= index+1, index= False, header= False)
+        if(index == 0):
+            df.to_excel(writer, sheet_name= "Sheet1", startrow= 0)
+            df.to_excel(writer, sheet_name= "Sheet1", startrow= index+1, index= False, header= False)
+            
+        else:    
+            df.to_excel(writer, sheet_name= "Sheet1", startrow= index+1, index= False, header= False)
 
 
 
-    # df.to_excel(, sheet_name = f"{UrlName['Names'][index]}.xlsx", index= False)
 
     # close the browser
     browser.quit()
