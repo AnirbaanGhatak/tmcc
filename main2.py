@@ -86,3 +86,18 @@ spend_baised_waiver = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div
 for p in spend_baised_waiver:
     spend_baised_waiver= p.text
     print(p.text)
+
+eligibility = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[2]/div[2]/div[1]/ul[9]")
+for eli in eligibility:
+    eligibility = eli.text
+    print(eli.text)
+
+docs_req = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[2]/div[2]/div[1]/ul[10]")
+for docs in docs_req:
+    docs_req = docs.text
+    print(docs.text)
+
+limit = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[2]/div[2]/div[1]/p[25]")
+for lim in limit:
+    limit = lim.text
+    print(lim.text)
