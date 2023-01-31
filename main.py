@@ -7,6 +7,9 @@ import openpyxl as opx
 from openpyxl import *
 # create a new Chrome browser instance
 
+
+flName = "All_CC_Details.xlsx"
+
 browser = webdriver.Chrome()
 
 # navigate to the bank's website
@@ -21,54 +24,49 @@ for bankName in banks:
     ccls = [xs.text for xs in cctrial]
     print(ccls) 
 
-
-    # done by kadu i think so ----------------------------------
-    # extract the name and features of all credit cards``
-    # credit_cards = browser.find_elements(By.CSS_SELECTOR, ".h3, h3")
-    # for card in credit_cards:
-        # print(card)
-        # names = browser.find_elements(By.CSS_SELECTOR, ".h3, h3")
-        # features = browser.find_elements(By.CSS_SELECTOR,".card-list .item-points")
-        # name_list = [name.text for name in names]
-        # feature_list = [feature.text for feature in features]
-        # print(name_list)
-    #------------------------------------------------------------
-
-    # df = pd.DataFrame({"Names": name_list, "Features":feature_list})
     df = pd.DataFrame({"Names": ccls})
 
     
     wb = Workbook()
     ws = wb.active
     wb.create_sheet("Sheet1")
-    wb.save(filename = f"{bankName}_CC.xlsx")
+    wb.save(filename = flName)
 
-    with pd.ExcelWriter(f"{bankName}_CC.xlsx", mode= 'a', engine= "openpyxl", if_sheet_exists='overlay') as writer1:
+    with pd.ExcelWriter(flName, mode= 'a', engine= "openpyxl", if_sheet_exists='overlay') as writer1:
         df.to_excel(writer1, sheet_name='Sheet1', index=False)
 
     # close the browser
     browser.quit()
 
-    UrlName = pd.read_excel(f'{bankName}_CC.xlsx', sheet_name="Sheet1")
+    firstCCName = ccls[0]
 
-    # print(UrlName)
-    UrlName['Names'] = UrlName['Names'].str.split('Credit Card').str[0] + "Credit Card"
-    UrlName['Names'] = UrlName['Names'].str.lower()
-    UrlName['Names'] = UrlName['Names'].str.replace(" ",'-')
-    print(" and -\n" ,UrlName)
-    UrlName['Names'] = UrlName['Names'].str.replace("-–-",'-') #weird-ass case
+    for x in range(len(ccls)):
+        sfx = ccls[x].find("Card")+4
+        ccls[x] = ccls[x][:sfx]
+        ccls[x] = ccls[x].replace(" ",'-')
+        ccls[x] = ccls[x].replace("-–-",'-')
+        ccls[x] = ccls[x].replace("’", "")
+        ccls[x] = ccls[x].lower()
 
-    print("--\n" ,UrlName)
+        print(f"New Name: {ccls[x]}")
 
+    print(ccls)
+    ccindex = 0
 
-    for index in UrlName.index:
+    for ccname in ccls:
+        print(ccindex)
+        print(ccname)
         # print("hello",index)
         # print(UrlName['Names'][index])
 
         browser = webdriver.Chrome()
 
         # navigate to the bank's website
-        browser.get(f"https://cardinsider.com/{bankName}/{UrlName['Names'][index]}/")
+        browser.get(f"https://cardinsider.com/{bankName}/{ccname}/")
+
+
+
+        # this is from main2.py---------------------------------------
 
         # extract the name and features of all credit cards
         credit_card_name = browser.find_elements(By.CSS_SELECTOR, ".title_list_link")
@@ -177,27 +175,47 @@ for bankName in banks:
             add_on_card_fee= p.text
             print(p.text)
 
+        eligibility = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[2]/div[2]/div[1]/ul[9]")
+        for eli in eligibility:
+            eligibility = eli.text
+            print(eli.text)
+
+        docs_req = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[2]/div[2]/div[1]/ul[10]")
+        for docs in docs_req:
+            docs_req = docs.text
+            print(docs.text)
+
+        limit = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[2]/div[2]/div[1]/p[25]")
+        for lim in limit:
+            limit = lim.text
+            print(lim.text)
+        
+
 
         df = pd.DataFrame({"Best For":[category],"Joining Fee":[join_fee],"Renewal Fee":[renewal_fee],"Welcome Bonus":[welcome_bonus],"Reward Rates":[rew_rates],
         "travel":[travel],"Domestic Lounge Access":[domestic_lounge_access],"Insurance Benefits":[insurance_benefits],"Movie & Dining":[movie_and_dining],"Reward redemption":[reward_redemption],"Golf":[golf],"International lounge access":[international_lounge_access],
         "Zero Liability Protection":[zero_liability_protection],"Spend based waiver":[spend_baised_waiver],"Reward redemption fee":[reward_redemption_fee],"Foreign currency markup":[foreign_currency_markup],"Interest Rates":[interest_rates],"Fuel Surcharge":[fuel_surcharge],
-        "Cash advance charge":[cash_adv_charge],"Add on card fee":[add_on_card_fee],
+        "Cash advance charge":[cash_adv_charge],"Add on card fee":[add_on_card_fee], "Eligibility":[eligibility],"Documents Required":[docs_req], "Limit":[limit]
         })
         
         # headers = ["Name", "Best For", "Joining Fee", "Renewal Fee", "Welcome Bonus", "Reward Rates", "travel", "Domestic Lounge Access", "Insurance Benefits", "Movie & Dining", "Reward redemption", "Golf", "International lounge access", "Zero Liability Protection", "Spend based waiver", "Reward redemption fee", "Foreign currency markup", "Interest Rates", "Fuel Surcharge", "Cash advance charge"	"Add on card fee"]
 
-        with pd.ExcelWriter(f"{bankName}_CC.xlsx", mode= 'a', engine= "openpyxl", if_sheet_exists='overlay') as writer:
-            if(index == 0):
+        # hf =  pd.DataFrame(headers)
 
-                df.to_excel(writer, sheet_name= "Sheet1", startrow= 0)
-                # df.to_excel(writer, sheet_name= "Sheet1", startcol=2, startrow= index+1, index= False, header= False)
+        with pd.ExcelWriter(flName, mode= 'a', engine= "openpyxl", if_sheet_exists='overlay') as writer:
+            if(ccindex == 0):
 
-                df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= index+1, index= False, header= False)
+               # df.to_excel(writer, sheet_name= "Sheet1", startcol=2, startrow= index+1, index= False, header= False)
+
+                df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= 0, index= False)
+
             else:
-                df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= index+1, index= False, header= False)
+                df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= ccindex+1, index= False, header= False)
 
 
 
 
+        ccindex+=1
         # close the browser
         browser.quit()
+        
