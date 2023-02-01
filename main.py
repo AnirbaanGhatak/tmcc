@@ -14,12 +14,12 @@ flName = "All_CC_Details.xlsx"
 
 browser = webdriver.Firefox()
 
-ccindex = 37
-bnindex = 37
+ccindex = 0
+bnindex = 0
 
 # navigate to the bank's website
 
-banks = ['sbi-card', 'yes-bank', 'idfc-first-bank', 'au-small-finance-bank', 'indusind-bank', 'axis-bank', 'kotak', 'icici-bank', 'american-express']
+banks = ['hdfc-bank','sbi-card', 'yes-bank','idfc-first-bank', 'au-small-finance-bank', 'indusind-bank', 'axis-bank', 'kotak', 'icici-bank']
 # banks=['sbi-card','yes-bank']
 for bankName in banks:
     browser.get(f"https://cardinsider.com/{bankName}")
@@ -45,8 +45,8 @@ for bankName in banks:
     firstCCName = ccls[0]
 
     for x in range(len(ccls)):
-        sfx = ccls[x].find("Card")+4
-        ccls[x] = ccls[x][:sfx]
+        # sfx = ccls[x].find("Card")+4
+        # ccls[x] = ccls[x][:sfx]
         ccls[x] = ccls[x].replace(" ",'-')
         ccls[x] = ccls[x].replace("-–-",'-')
         ccls[x] = ccls[x].replace("’", "")
@@ -70,13 +70,21 @@ for bankName in banks:
 
         # print(f"hello: {ccurl}")
 
-        response = requests.get(ccurl, headers={'User-Agent': 'Mozilla/5.0'})
-
-        if response.status_code == 200:
+        if requests.get(ccurl, headers={'User-Agent': 'Mozilla/5.0'}).status_code == 200:
             browser.get(f"{ccurl}")
         else:
-            nccn = ccname.replace("-bank","")
-            browser.get(f"https://cardinsider.com/{bankName}/{nccn}/")
+            cn = ccname
+            print(f'cn: {cn}')
+            sfx = cn.find("card")+4
+            cn = cn[:sfx]
+            print(f'cn2: {cn}')
+
+
+            if requests.get(f"https://cardinsider.com/{bankName}/{cn}/", headers={'User-Agent': 'Mozilla/5.0'}).status_code == 200:
+                browser.get(f"https://cardinsider.com/{bankName}/{cn}/")
+            else:
+                nccn = cn.replace("-bank","")
+                browser.get(f"https://cardinsider.com/{bankName}/{nccn}/")
 
 
         # this is from main2.py---------------------------------------
