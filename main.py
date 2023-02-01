@@ -14,12 +14,12 @@ flName = "All_CC_Details.xlsx"
 
 browser = webdriver.Firefox()
 
-ccindex = 0
-bnindex = 0
+ccindex = 167
+bnindex = 167
 
 # navigate to the bank's website
 
-banks = ['hdfc-bank','sbi-card', 'yes-bank','idfc-first-bank', 'au-small-finance-bank', 'indusind-bank', 'axis-bank', 'kotak', 'icici-bank']
+banks = ['icici-bank']
 # banks=['sbi-card','yes-bank']
 for bankName in banks:
     browser.get(f"https://cardinsider.com/{bankName}")
@@ -36,8 +36,10 @@ for bankName in banks:
         wb.save(filename = flName)
 
     with pd.ExcelWriter(flName, mode= 'a', engine= "openpyxl", if_sheet_exists='overlay') as writer1:
-        # df.to_excel(writer1, sheet_name='Sheet1', startrow= bnindex, index=False)
-        df.to_excel(writer1, sheet_name='Sheet1', startrow= bnindex, index=False, header= False)
+        if(bankName == 'hdfc-bank'):
+            df.to_excel(writer1, sheet_name='Sheet1', startrow= bnindex, index=False)
+        else:
+            df.to_excel(writer1, sheet_name='Sheet1', startrow= bnindex, index=False, header= False)
 
     # close the browser
     browser.quit()
@@ -97,7 +99,6 @@ for bankName in banks:
         print("-------------")
         category = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[1]/div/div[1]/div[2]/div/div[3]/p")
         for cat in category:
-
             category = cat.text.replace("|", ",")
             print(cat.text)
 
@@ -231,16 +232,10 @@ for bankName in banks:
         with pd.ExcelWriter(flName, mode= 'a', engine= "openpyxl", if_sheet_exists='overlay') as writer:
             if(ccindex == 0):
 
-               # df.to_excel(writer, sheet_name= "Sheet1", startcol=2, startrow= index+1, index= False, header= False)
-
                 df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= 0, index= False)
 
             else:
-                # df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= ccindex+1, index= False, header= False)
                 df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= ccindex, index= False, header= False)
-
-
-
 
 
         ccindex+=1
@@ -249,4 +244,7 @@ for bankName in banks:
         browser.quit()
 
     print(f"vals{ccindex}")
+
+sleep(10.0)
+
         
