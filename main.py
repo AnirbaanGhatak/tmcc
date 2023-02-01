@@ -5,35 +5,39 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import openpyxl as opx
 from openpyxl import *
+from time import sleep
+import requests
 # create a new Chrome browser instance
 
 
 flName = "All_CC_Details.xlsx"
 
-browser = webdriver.Chrome()
+browser = webdriver.Firefox()
+
+ccindex = 37
+bnindex = 37
 
 # navigate to the bank's website
 
-banks = ['hdfc-bank', 'sbi-card', 'yes-bank', 'idfc-first-bank', 'au-small-finance-bank', 'indusind-bank', 'axis-bank', 'kotak', 'icici-bank', 'american-express']
-
+banks = ['sbi-card', 'yes-bank', 'idfc-first-bank', 'au-small-finance-bank', 'indusind-bank', 'axis-bank', 'kotak', 'icici-bank', 'american-express']
+# banks=['sbi-card','yes-bank']
 for bankName in banks:
-
-    browser.get(f"https://cardinsider.com/{bankName}/")
-
+    browser.get(f"https://cardinsider.com/{bankName}")
     cctrial = browser.find_elements(By.CLASS_NAME, "title_list_link")
     ccls = [xs.text for xs in cctrial]
     print(ccls) 
 
     df = pd.DataFrame({"Names": ccls})
 
-    
-    wb = Workbook()
-    ws = wb.active
-    wb.create_sheet("Sheet1")
-    wb.save(filename = flName)
+    if bankName == 'hdfc-bank':
+        wb = Workbook()
+        ws = wb.active
+        wb.create_sheet("Sheet1")
+        wb.save(filename = flName)
 
     with pd.ExcelWriter(flName, mode= 'a', engine= "openpyxl", if_sheet_exists='overlay') as writer1:
-        df.to_excel(writer1, sheet_name='Sheet1', index=False)
+        # df.to_excel(writer1, sheet_name='Sheet1', startrow= bnindex, index=False)
+        df.to_excel(writer1, sheet_name='Sheet1', startrow= bnindex, index=False, header= False)
 
     # close the browser
     browser.quit()
@@ -51,7 +55,6 @@ for bankName in banks:
         print(f"New Name: {ccls[x]}")
 
     print(ccls)
-    ccindex = 0
 
     for ccname in ccls:
         print(ccindex)
@@ -59,11 +62,21 @@ for bankName in banks:
         # print("hello",index)
         # print(UrlName['Names'][index])
 
-        browser = webdriver.Chrome()
+        browser = webdriver.Firefox()
 
         # navigate to the bank's website
-        browser.get(f"https://cardinsider.com/{bankName}/{ccname}/")
 
+        ccurl = f"https://cardinsider.com/{bankName}/{ccname}/"
+
+        # print(f"hello: {ccurl}")
+
+        response = requests.get(ccurl, headers={'User-Agent': 'Mozilla/5.0'})
+
+        if response.status_code == 200:
+            browser.get(f"{ccurl}")
+        else:
+            nccn = ccname.replace("-bank","")
+            browser.get(f"https://cardinsider.com/{bankName}/{nccn}/")
 
 
         # this is from main2.py---------------------------------------
@@ -76,7 +89,8 @@ for bankName in banks:
         print("-------------")
         category = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[1]/div/div[1]/div[2]/div/div[3]/p")
         for cat in category:
-            category = cat.text
+
+            category = cat.text.replace("|", ",")
             print(cat.text)
 
         join_fee = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[1]/div/div[1]/div[2]/div/div[4]/p") #same as renewal fee
@@ -180,22 +194,26 @@ for bankName in banks:
             eligibility = eli.text
             print(eli.text)
 
-        docs_req = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[2]/div[2]/div[1]/ul[10]")
-        for docs in docs_req:
-            docs_req = docs.text
-            print(docs.text)
-
-        limit = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[2]/div[2]/div[1]/p[25]")
+        limit = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[2]/div[2]/div[1]/h2[9]")
         for lim in limit:
             limit = lim.text
             print(lim.text)
-        
 
+
+        # eligibilityAnirbaan = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[2]/div[2]/div[1]/h2[5]")
+        # for eli in eligibilityAnirbaan:
+        #     eligibilityAnirbaan = eli.text
+        #     print(eli.text)
+        
+        # limitAnirbaan = browser.find_elements(By.XPATH,"/html/body/div[1]/main/div[2]/div[2]/div[1]/p[15]")
+        # for lim in limitAnirbaan:
+        #     limitAnirbaan = lim.text
+        #     print(lim.text)
 
         df = pd.DataFrame({"Best For":[category],"Joining Fee":[join_fee],"Renewal Fee":[renewal_fee],"Welcome Bonus":[welcome_bonus],"Reward Rates":[rew_rates],
         "travel":[travel],"Domestic Lounge Access":[domestic_lounge_access],"Insurance Benefits":[insurance_benefits],"Movie & Dining":[movie_and_dining],"Reward redemption":[reward_redemption],"Golf":[golf],"International lounge access":[international_lounge_access],
         "Zero Liability Protection":[zero_liability_protection],"Spend based waiver":[spend_baised_waiver],"Reward redemption fee":[reward_redemption_fee],"Foreign currency markup":[foreign_currency_markup],"Interest Rates":[interest_rates],"Fuel Surcharge":[fuel_surcharge],
-        "Cash advance charge":[cash_adv_charge],"Add on card fee":[add_on_card_fee], "Eligibility":[eligibility],"Documents Required":[docs_req], "Limit":[limit]
+        "Cash advance charge":[cash_adv_charge],"Add on card fee":[add_on_card_fee], "Eligibility":[eligibility], "Limit":[limit]
         })
         
         # headers = ["Name", "Best For", "Joining Fee", "Renewal Fee", "Welcome Bonus", "Reward Rates", "travel", "Domestic Lounge Access", "Insurance Benefits", "Movie & Dining", "Reward redemption", "Golf", "International lounge access", "Zero Liability Protection", "Spend based waiver", "Reward redemption fee", "Foreign currency markup", "Interest Rates", "Fuel Surcharge", "Cash advance charge"	"Add on card fee"]
@@ -210,12 +228,17 @@ for bankName in banks:
                 df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= 0, index= False)
 
             else:
-                df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= ccindex+1, index= False, header= False)
+                # df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= ccindex+1, index= False, header= False)
+                df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= ccindex, index= False, header= False)
+
 
 
 
 
         ccindex+=1
+        bnindex+=1
         # close the browser
         browser.quit()
+
+    print(f"vals{ccindex}")
         
