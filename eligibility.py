@@ -10,15 +10,12 @@ import requests
 # create a new Chrome browser instance
 
 
-flName = "All_CC_Details2.xlsx"
-
 browser = webdriver.Firefox()
 
 
 # navigate to the bank's website
 
-banks = ['icici-bank', 'bank-of-baroda', 'idfc-first-bank', 'union-bank', 'yes-bank', 'indusind-bank', 'rbl-bank', 'karur-vysya-bank',
-         'canara-bank', 'lic-cards', 'punjab-national-bank', 'hsbc-bank', 'au-small-finance-bank', 'idbi-bank', 'citibank', 'kotak', 'axis-bank']
+banks = ['icici-bank']
 for bankName in banks:
     browser.get(f"https://cardinsider.com/{bankName}")
     cctrial = browser.find_elements(By.CLASS_NAME, "title_list_link")
