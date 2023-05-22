@@ -8,7 +8,7 @@ import pandas as pd
 browser = webdriver.Chrome()
 
 # navigate to the bank's website
-browser.get("https://cardinsider.com/yes-bank/yes-private-credit-card/")
+browser.get("https://cardinsider.com/icici-bank/icici-hpcl-super-saver-credit-card/")
 
 # extract the name and features of all credit cards
 credit_card_name = browser.find_elements(By.CSS_SELECTOR, ".title_list_link")
@@ -139,4 +139,4 @@ df = pd.DataFrame({"Best For":[category],"Joining Fee":[join_fee],"Renewal Fee":
         # hf =  pd.DataFrame(headers)
 
 with pd.ExcelWriter("All_CC_Details.xlsx", mode= 'a', engine= "openpyxl", if_sheet_exists='overlay') as writer:
-        df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= 78, index= False, header= False)
+        df.to_excel(writer, sheet_name= "Sheet1", startcol=1, startrow= 172, index= False, header= False)
